@@ -11,7 +11,6 @@ public class GestureManager : Singleton<GestureManager>
     public GestureRecognizer ActionRecognizer { get; private set; }
 
     GestureRecognizer ManipulationRecognizer;
-    GestureRecognizer ActiveRecognizer;
 
     public bool IsNavigating { get; private set; }
 
@@ -58,9 +57,7 @@ public class GestureManager : Singleton<GestureManager>
         ManipulationRecognizer.ManipulationCompletedEvent += ManipulationRecognizer_ManipulationCompletedEvent;
         ManipulationRecognizer.ManipulationCanceledEvent += ManipulationRecognizer_ManipulationCanceledEvent;
 
-        //____________Active Recogniser____________
-        ActiveRecognizer = ActionRecognizer;
-        ActiveRecognizer.StartCapturingGestures();
+        ActionRecognizer.StartCapturingGestures();
     }
 
     void OnDestroy()
@@ -78,42 +75,6 @@ public class GestureManager : Singleton<GestureManager>
         ManipulationRecognizer.ManipulationCanceledEvent -= ManipulationRecognizer_ManipulationCanceledEvent;
     }
 
-    public void StartManipulation()
-    {
-        Transition(ManipulationRecognizer);
-    }
-
-    public void StartNavigation()
-    {
-        Transition(ActionRecognizer);
-    }
-
-    /// <summary>
-    /// Transition to the new recognizer
-    /// </summary>
-    /// <param name="newRecognizer"></param>
-    void Transition(GestureRecognizer newRecognizer)
-    {
-        if (newRecognizer == null)
-        {
-            return;
-        }
-
-        if (ActiveRecognizer != null)
-        {
-            if (ActiveRecognizer == newRecognizer)
-            {
-                return;
-            }
-
-            ActiveRecognizer.CancelGestures();
-            ActiveRecognizer.StopCapturingGestures();
-        }
-
-        newRecognizer.StartCapturingGestures();
-        ActiveRecognizer = newRecognizer;
-    }
-
     /// <summary>
     /// Air tap callback
     /// </summary>
@@ -122,32 +83,14 @@ public class GestureManager : Singleton<GestureManager>
     /// <param name="ray"></param>
     private void ActionRecognizer_TappedEvent(InteractionSourceKind source, int tapCount, Ray ray)
     {
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit,20, airTapLayer))
-        {
-            //Tells the hit object that it has been targeted by an air tap
-            hit.collider.SendMessage("OnAirTap");
-        }
-        else
-        {
             //Throw the air tap event
             event_AirTap.Invoke();
-        }
     }
 
     private void ManipulationRecognizer_TappedEvent(InteractionSourceKind source, int tapCount, Ray ray)
     {
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 20, airTapLayer))
-        {
-            //Tells the hit object that it has been targeted by an air tap
-            hit.collider.SendMessage("OnAirTap");
-        }
-        else
-        {
             //Throw the air tap event
             event_AirTap.Invoke();
-        }
     }
 
     private void ActionRecognizer_NavigationStartedEvent(InteractionSourceKind source, Vector3 relativePosition, Ray ray)
