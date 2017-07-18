@@ -35,10 +35,12 @@ public class Portal : MonoBehaviour {
         yield return StartCoroutine(Scale(1, 0, animTime));
 
         //Move the transform at [distance] in front of the camera
-        transform.position = Camera.main.transform.position + Camera.main.transform.forward * distanceFromCam;
+        transform.position = cam.transform.position + cam.transform.forward * distanceFromCam;
 
         //Rotate it toward the camera
-        transform.LookAt(Camera.main.transform.position * 2 - transform.position);
+        Vector3 target = 2*transform.position - cam.transform.position;
+        target.y = transform.position.y;
+        transform.LookAt(target);
 
         StartCoroutine(Scale(0, 1, animTime));
     }

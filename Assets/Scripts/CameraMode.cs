@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CameraMode : MonoBehaviour {
 
+    [Header("Layers")]
+
     [SerializeField]
     LayerMask realMask;
 
